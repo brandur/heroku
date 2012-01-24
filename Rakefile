@@ -109,10 +109,12 @@ def s3_connect
   @s3_connected = true
 end
 
-def store(package_file, filename, bucket="assets.heroku.com")
+def store(package_file, filename,
+          bucket=ENV["HEROKU_RELEASE_BUCKET"] || "assets.heroku.com")
   s3_connect
-  puts "storing: #{filename}"
-  AWS::S3::S3Object.store(filename, File.open(package_file), bucket, :access => :public_read)
+  puts "storing: #{filename} in #{bucket}"
+  AWS::S3::S3Object.store(filename, File.open(package_file), bucket,
+                          :access => :public_read)
 end
 
 def tempdir

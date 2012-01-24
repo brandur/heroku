@@ -24,7 +24,7 @@ file pkg("/apt-#{version}/heroku-toolbelt-#{version}.deb") => distribution_files
     sh "apt-ftparchive packages . > Packages"
     sh "gzip -c Packages > Packages.gz"
     sh "apt-ftparchive release . > Release"
-    sh "gpg -abs -u 0F1B0520 -o Release.gpg Release"
+    sh "gpg -abs -u #{ENV['HEROKU_RELEASE_GPG_ID']} -o Release.gpg Release"
   end
 end
 
@@ -41,7 +41,7 @@ desc "Publish .deb to S3."
 task "deb:release" => "deb:build" do |t|
   Dir["pkg/apt-#{version}/*"].each do |file|
     unless File.directory?(file)
-      store file, "apt/#{File.basename(file)}", "heroku-toolbelt"
+      store file, "apt/#{File.basename(file)}", ENV["HEROKU_RELEASE_BUCKET"]
     end
   end
 end
